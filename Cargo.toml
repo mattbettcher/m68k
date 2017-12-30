@@ -1,0 +1,6 @@
+[package]
+name = "m68k"
+version = "0.1.0"
+authors = ["Matthew Bettcher <mattbettcher@gmail.com>"]
+
+[dependencies]
