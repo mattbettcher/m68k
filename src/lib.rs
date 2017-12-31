@@ -138,6 +138,7 @@ pub struct M68k<'a> {
     pub sfc: u32,
     pub dfc: u32,
     // '020+
+    pub cahr: u32,      // cache holding register (ref MC68020UM Fig 1-5. Instruction Pipe)
     pub caar: u32,
     pub cacr: u32,
     pub inactive_isp: u32,
@@ -159,6 +160,7 @@ impl<'a> M68k<'a> {
             vbr: 0,
             caar: 0,
             cacr: 0,
+            cahr: 0,
             sfc: 0, dfc: 0,
             cache_enabled: true,
             cache: [CacheLine020::default(); 64],
