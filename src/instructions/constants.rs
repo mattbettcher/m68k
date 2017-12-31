@@ -25,15 +25,15 @@ pub const ZFLAG_CLEAR: u32 =  0xffffffff; // used as "non-z-flag"
 
 // Control Registers
 // '010+
-pub const SFC: u32 = 0x000;
-pub const DFC: u32 = 0x001;
-pub const USP: u32 = 0x800;
-pub const VBR: u32 = 0x801;
+pub const SFC:  u16 = 0x000;
+pub const DFC:  u16 = 0x001;
+pub const USP:  u16 = 0x800;
+pub const VBR:  u16 = 0x801;
 // '020+
-pub const CACR: u32 = 0x002;
-pub const CAAR: u32 = 0x802;
-pub const MSP: u32 = 0x803;
-pub const ISP: u32 = 0x804;
+pub const CACR: u16 = 0x002;
+pub const CAAR: u16 = 0x802;
+pub const MSP:  u16 = 0x803;
+pub const ISP:  u16 = 0x804;
 // '040+
 // TODO !
 

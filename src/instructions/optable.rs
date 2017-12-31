@@ -1283,6 +1283,10 @@ const FROM_AN: u32 = 0x8;
 pub const OP_MOVE_32_TOU : u32 = OP_MOVE2 | MOVE_USP | TO_AN;
 pub const OP_MOVE_32_FRU : u32 = OP_MOVE2 | MOVE_USP | FROM_AN;
 
+// MOVEC
+pub const OP_MOVE_32_CR : u32 = 0b0100_1110_0111_1010;
+pub const OP_MOVE_32_RC : u32 = 0b0100_1110_0111_1011;
+
 // Put constants for MOVEM here
 const WORD_TRANSFER: u32 = 0x00;
 const LONG_TRANSFER: u32 = 0x40;
@@ -3094,6 +3098,10 @@ fn generate_optable<'a>() -> Vec<OpcodeHandler<'a>> {
         // Put op-entries for MOVE USP here
         op_entry!(MASK_OUT_Y, OP_MOVE_32_TOU, move_32_tou),
         op_entry!(MASK_OUT_Y, OP_MOVE_32_FRU, move_32_fru),
+
+        // MOVEC
+        op_entry!(MASK_EXACT, OP_MOVE_32_RC, move_32_rc),
+        op_entry!(MASK_EXACT, OP_MOVE_32_CR, move_32_cr),
 
         // Put op-entries for MOVEM here
         op_entry!(MASK_OUT_Y, OP_MOVEM_16_RE_AI,   movem_16_re_ai),

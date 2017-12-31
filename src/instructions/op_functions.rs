@@ -2019,6 +2019,50 @@ pub fn move_32_fru<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32
         Err(PrivilegeViolation(core.ir, core.pc.wrapping_sub(2)))
     }
 }
+// MOVEC
+pub fn move_32_cr<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
+    if core.s != 0 {
+        let extension = imm_16(core, bus)? as u16;
+        let ad = if extension >> 14 == 0 { 0 } else { 8 };
+        let reg = (((extension >> 11) & 7) + ad) as usize;
+        core.dar[reg] = match extension & 0x0fff {
+            SFC  => core.sfc,
+            DFC  => core.dfc,
+            USP  => core.inactive_usp,
+            VBR  => core.vbr,
+            CACR => core.cacr,
+            CAAR => core.caar,
+            MSP  => core.inactive_ssp,  // ssp is called msp on `020+
+            ISP  => core.inactive_isp,
+            _ => unimplemented!("Control Register not yet implemented."),
+        };
+        Ok(6)   // this is cache case
+    } else {
+        Err(PrivilegeViolation(core.ir, core.pc.wrapping_sub(2)))
+    }
+}
+pub fn move_32_rc<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
+    if core.s != 0 {
+        let extension = imm_16(core, bus)? as u16;
+        let ad = if extension >> 14 == 0 { 0 } else { 8 };
+        let reg = (((extension >> 11) & 7) + ad) as usize;
+        match extension & 0x0fff {
+            SFC  => core.sfc = core.dar[reg],
+            DFC  => core.dfc = core.dar[reg],
+            USP  => core.inactive_usp = core.dar[reg],
+            VBR  => core.vbr = core.dar[reg],
+            CACR => core.cacr = core.dar[reg],
+            CAAR => core.caar = core.dar[reg],
+            MSP  => core.inactive_ssp = core.dar[reg],  
+            ISP  => core.inactive_isp = core.dar[reg],
+            _ => unimplemented!("Control Register not yet implemented."),
+        };
+        Ok(12)   // this is cache case
+    } else {
+        Err(PrivilegeViolation(core.ir, core.pc.wrapping_sub(2)))
+    }
+}
+
 // Put implementation of MOVEM ops here
 macro_rules! movem_16_re {
     ($name:ident, predecrement_ay_16, $cycles:expr) => (
