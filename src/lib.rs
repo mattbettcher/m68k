@@ -169,6 +169,14 @@ impl<'a> M68k<'a> {
         }
     }
 
+    pub fn reset<T: Bus + ?Sized>(&mut self, bus: &mut T) {
+        self.s = SFLAG_SET;
+        self.int_mask = 0x7;
+        self.pc = 0;
+        sp!(self) = self.read_imm_prog_32(bus).unwrap();
+        self.pc = self.read_imm_prog_32(bus).unwrap();
+    }
+
     pub fn step<T: Bus + ?Sized>(&mut self, bus: &mut T) {
         if let Ok(x) = self.read_imm_prog_16(bus) {
             self.ir = x;
@@ -393,5 +401,9 @@ impl<'a> M68k<'a> {
                 }
             },
         }
+    }
+
+    fn read_imm_prog_32<T: Bus + ?Sized>(&mut self, bus: &mut T) -> Result<u32> {
+        unimplemented!()
     }
 }
