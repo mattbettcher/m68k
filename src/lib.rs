@@ -139,7 +139,7 @@ pub struct M68k<'a> {
     // '020+
     pub caar: u32,
     pub cacr: u32,
-    pub inactive_msp: u32,
+    pub inactive_isp: u32,
 
     pub cache_enabled: bool,    // this represents the external pin???
     pub cache: [CacheLine020; 64], // '020 only! other caches are different
@@ -151,7 +151,7 @@ impl<'a> M68k<'a> {
     pub fn new(version: Version) -> Self {
         M68k {
             version: version,
-            pc: 0, inactive_ssp: 0, inactive_usp: 0, inactive_msp: 0, ir: 0,
+            pc: 0, inactive_ssp: 0, inactive_usp: 0, inactive_isp: 0, ir: 0,
             dar: [0u32; 16], 
             irq_level: 0, 
             s: 1, int_mask: 0, x: 0, v: 0, c: 0, n: 0, not_z: 0xffffffff,
