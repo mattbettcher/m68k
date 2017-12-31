@@ -2032,7 +2032,7 @@ pub fn move_32_cr<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> 
             VBR  => core.vbr,
             CACR => core.cacr,
             CAAR => core.caar,
-            MSP  => core.inactive_ssp,  // ssp is called msp on `020+
+            MSP  => core.inactive_msp,  // ssp is called msp on `020+
             ISP  => core.inactive_isp,
             _ => unimplemented!("Control Register not yet implemented."),
         };
@@ -2053,7 +2053,7 @@ pub fn move_32_rc<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> 
             VBR  => core.vbr = core.dar[reg],
             CACR => core.cacr = core.dar[reg],
             CAAR => core.caar = core.dar[reg],
-            MSP  => core.inactive_ssp = core.dar[reg],  
+            MSP  => core.inactive_msp = core.dar[reg],  
             ISP  => core.inactive_isp = core.dar[reg],
             _ => unimplemented!("Control Register not yet implemented."),
         };

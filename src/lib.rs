@@ -1,4 +1,4 @@
-#![feature(universal_impl_trait)]
+//#![feature(universal_impl_trait)]
 //#![feature(nll)]
 
 #![allow(non_camel_case_types)]
@@ -120,11 +120,12 @@ pub struct CacheLine020 {
 pub struct M68k<'a> {
     pub version: Version,
     pub pc: u32,
-    pub inactive_ssp: u32, // when in user mode
+    pub inactive_msp: u32, // when in user mode
     pub inactive_usp: u32, // when in supervisor mode
     pub ir: u16,
     pub dar: [u32; 16],
     pub s: u32,
+    pub m: u32,
     pub irq_level: u8,
     pub int_mask: u32,
     pub x: u32,
@@ -151,10 +152,10 @@ impl<'a> M68k<'a> {
     pub fn new(version: Version) -> Self {
         M68k {
             version: version,
-            pc: 0, inactive_ssp: 0, inactive_usp: 0, inactive_isp: 0, ir: 0,
+            pc: 0, inactive_msp: 0, inactive_usp: 0, inactive_isp: 0, ir: 0,
             dar: [0u32; 16], 
             irq_level: 0, 
-            s: 1, int_mask: 0, x: 0, v: 0, c: 0, n: 0, not_z: 0xffffffff,
+            s: SFLAG_SET, m: MFLAG_SET, int_mask: 0, x: 0, v: 0, c: 0, n: 0, not_z: 0xffffffff,
             vbr: 0,
             caar: 0,
             cacr: 0,
@@ -174,8 +175,9 @@ impl<'a> M68k<'a> {
     }
 
     pub fn status_register(&self) -> u16 {
-        ((self.s << 11)                |
-        self.int_mask                        |
+        ((self.s << SFLAG_BIT)         |
+        (self.m << MFLAG_BIT)          |
+        (self.int_mask << INT_BITS)    |
         ((self.x & XFLAG_SET) >> 4)    |
         ((self.n & NFLAG_SET) >> 4)    |
         ((not1!(self.not_z))  << 2)    |
@@ -188,25 +190,37 @@ impl<'a> M68k<'a> {
     }
 
     pub fn sr_to_flags(&mut self, sr: u16) {
-        let sr = (sr & CPU_SR_MASK) as u32;
-        let old_sflag = self.s;
-        self.int_mask = sr & CPU_SR_INT_MASK;
-        self.s =           (sr >> 11) & SFLAG_SET;
-        self.x =            (sr <<  4) & XFLAG_SET;
-        self.n =            (sr <<  4) & NFLAG_SET;
+        let old_mflag = self.m;
+        let sr = (sr & CPU_SR_MASK) as u32;                                 // mask out any invalid bits
+        let old_sflag = self.s;                                             // save old status
+        self.int_mask = (sr & CPU_SR_INT_MASK) >> INT_BITS;                 // get interrupt level mask
+        self.s = sr & SFLAG_SET;                                            // get s flag
+        self.m = sr & MFLAG_SET;                                            // get m flag
+        // below remains unchanged so far
+        self.x = (sr <<  4) & XFLAG_SET;
+        self.n = (sr <<  4) & NFLAG_SET;
         self.not_z = not1!(sr & 0b00100);
-        self.v =            (sr <<  6) & VFLAG_SET;
-        self.c =            (sr <<  8) & CFLAG_SET;
+        self.v = (sr <<  6) & VFLAG_SET;
+        self.c = (sr <<  8) & CFLAG_SET;
+        // account for s & m flags as per M68020UM 2.1 (Note: this should be backward compatible with all earlier models)
+        // this needs tested, I'm not 100% clear on every edge case here
         if old_sflag != self.s {
-            if self.s == SFLAG_SET {
-                self.inactive_usp = sp!(self);
-                sp!(self) = self.inactive_ssp;
+            if self.s == SFLAG_SET {            // change to supervisor level
+                self.inactive_usp = sp!(self);  // save usp
+                if self.m == MFLAG_SET {
+                    sp!(self) = self.inactive_msp;  // if m flag is set use msp
+                } else {
+                    sp!(self) = self.inactive_isp;  // if m flag is clear use isp
+                }
             } else {
-                self.inactive_ssp = sp!(self);
+                if old_mflag == MFLAG_SET {
+                    self.inactive_msp = sp!(self);  // if m flag was set save msp
+                } else {
+                    self.inactive_isp = sp!(self);  // if m flag was clear save isp
+                }
                 sp!(self) = self.inactive_usp;
             }
         }
-        // println!("{} {:016b} {} {}", self.flags(), sr, self.not_z_flag, sr & 0b00100);
     }
 
     pub fn ccr_to_flags(&mut self, ccr: u16) {
