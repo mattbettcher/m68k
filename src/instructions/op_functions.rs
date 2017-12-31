@@ -14,21 +14,21 @@ use super::super::Result;
 
 macro_rules! impl_op {
     (-, $common:ident, $name:ident, $src:ident, dx, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dx!(core);
             let _ = $common(core, dst, src);
             Ok($cycles)
         });
     (-, $common:ident, $name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = $dst(core, bus)?;
             let _ = $common(core, dst, src);
             Ok($cycles)
         });
     (8, $common:ident, $name:ident, $src:ident, dx, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dx!(core);
             let res = $common(core, dst, src);
@@ -36,7 +36,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (8, $common:ident, $name:ident, $src:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dy!(core);
             let res = $common(core, dst, src);
@@ -45,7 +45,7 @@ macro_rules! impl_op {
         });
         
     (16, $common:ident, $name:ident, $src:ident, dx, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dx!(core);
             let res = $common(core, dst, src);
@@ -53,7 +53,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (16, $common:ident, $name:ident, $src:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dy!(core);
             let res = $common(core, dst, src);
@@ -61,7 +61,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (32, $common:ident, $name:ident, $src:ident, dx, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dx!(core);
             let res = $common(core, dst, src);
@@ -69,7 +69,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (32, $common:ident, $name:ident, $src:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = dy!(core);
             let res = $common(core, dst, src);
@@ -77,7 +77,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (8, $common:ident, $name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst, src);
@@ -85,7 +85,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (16, $common:ident, $name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst, src);
@@ -93,7 +93,7 @@ macro_rules! impl_op {
             Ok($cycles)
         });
     (32, $common:ident, $name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst, src);
@@ -104,7 +104,7 @@ macro_rules! impl_op {
 
 macro_rules! impl_shift_op {
     (8, $common:ident, $name:ident, $shift_src:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let shift = $shift_src(core, bus)? & 0x3f; // mod 64
             let dst = dy!(core);
             let res = $common(core, dst, shift);
@@ -112,7 +112,7 @@ macro_rules! impl_shift_op {
             Ok($cycles + 2 * shift)
         });
     (16, $common:ident, $name:ident, 1, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let shift = 1;
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst, shift);
@@ -120,7 +120,7 @@ macro_rules! impl_shift_op {
             Ok($cycles)
         });
     (16, $common:ident, $name:ident, $shift_src:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let shift = $shift_src(core, bus)? & 0x3f; // mod 64
             let dst = dy!(core);
             let res = $common(core, dst, shift);
@@ -128,7 +128,7 @@ macro_rules! impl_shift_op {
             Ok($cycles + 2 * shift)
         });
     (32, $common:ident, $name:ident, $shift_src:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let shift = $shift_src(core, bus)? & 0x3f; // mod 64
             let dst = dy!(core);
             let res = $common(core, dst, shift);
@@ -137,17 +137,17 @@ macro_rules! impl_shift_op {
         });
 }
 
-pub fn illegal(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn illegal<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let illegal_exception = IllegalInstruction(core.ir, core.pc.wrapping_sub(2));
     // println!("Exception: {}", illegal_exception);
     Err(illegal_exception)
 }
 
-pub fn unimplemented_1010(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn unimplemented_1010<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     Err(UnimplementedInstruction(core.ir, core.pc.wrapping_sub(2), EXCEPTION_UNIMPLEMENTED_1010))
 }
 
-pub fn unimplemented_1111(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn unimplemented_1111<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     Err(UnimplementedInstruction(core.ir, core.pc.wrapping_sub(2), EXCEPTION_UNIMPLEMENTED_1111))
 }
 
@@ -252,7 +252,7 @@ add_32_re!(add_32_re_al, ea_al_32,     20+8);
 
 macro_rules! adda_16 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // we must evaluate AY (src) first
             // as the PI/PD addressing modes will change AX (if AX=AY)
             let src = $src(core, bus)?;
@@ -263,7 +263,7 @@ macro_rules! adda_16 {
 }
 macro_rules! adda_32 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // we must evaluate AY (src) first
             // as the PI/PD addressing modes will change AX (if AX=AY)
             let src = $src(core, bus)?;
@@ -371,7 +371,7 @@ addq_8!(addq_8_al, ea_al_8,     8+12);
 // addq_8!(..., imm) not present
 
 addq_16!(addq_16_dn, dy,  4);
-pub fn addq_16_an(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn addq_16_an<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let src = quick(core, bus)?;
     let dst = ay!(core);
     // When adding to address registers, the condition codes are not
@@ -392,7 +392,7 @@ addq_16!(addq_16_al, ea_al_16,     8+12);
 // addq_16!(..., imm) not present
 
 addq_32!(addq_32_dn, dy,  8);
-pub fn addq_32_an(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn addq_32_an<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let src = quick(core, bus)?;
     let dst = ay!(core);
     // When adding to address registers, the condition codes are not
@@ -564,13 +564,13 @@ andi_32!(andi_32_al, ea_al_32,     20+16);
 // andi_32!(..., pcix) not present
 // andi_32!(..., imm) not present
 
-pub fn andi_16_toc(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn andi_16_toc<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = core.condition_code_register();
     let src = mask_out_above_8!(imm_16(core, bus)?) as u16;
     core.ccr_to_flags(dst & src);
     Ok(20)
 }
-pub fn andi_16_tos(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn andi_16_tos<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         let dst = core.status_register();
         let src = imm_16(core, bus)? as u16;
@@ -635,7 +635,7 @@ asr_16!(asr_16_al, ea_al_16,    20);
 
 macro_rules! branch {
     (8, $name:ident, $cond:tt) => {
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             if core.condition($cond)
             {
                 let offset = mask_out_above_8!(core.ir) as i8;
@@ -647,7 +647,7 @@ macro_rules! branch {
         }
     };
     (16, $name:ident, $cond:tt) => {
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             if core.condition($cond)
             {
                 let offset = core.read_imm_data_16(bus)? as i16;
@@ -661,7 +661,7 @@ macro_rules! branch {
         }
     };
     (16, $name:ident, $cond:tt, dy) => {
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             if !core.condition($cond)
             {
                 let dst = dy!(core);
@@ -716,7 +716,7 @@ branch!(16, ble_16, LE);
 
 macro_rules! bchg_8 {
     ($name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)? & 7; // modulo 8
             let (dst, ea) = $dst(core, bus)?;
             let mask = 1 << src;
@@ -728,7 +728,7 @@ macro_rules! bchg_8 {
 
 macro_rules! bclr_8 {
     ($name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)? & 7; // modulo 8
             let (dst, ea) = $dst(core, bus)?;
             let mask = 1 << src;
@@ -740,7 +740,7 @@ macro_rules! bclr_8 {
 
 macro_rules! bset_8 {
     ($name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)? & 7; // modulo 8
             let (dst, ea) = $dst(core, bus)?;
             let mask = 1 << src;
@@ -752,7 +752,7 @@ macro_rules! bset_8 {
 
 macro_rules! btst_8 {
     ($name:ident, $src:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)? & 7; // modulo 8
             let dst = $dst(core, bus)?;
             let mask = 1 << src;
@@ -761,7 +761,7 @@ macro_rules! btst_8 {
         });
 }
 
-pub fn bchg_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn bchg_32_r_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = dx!(core);
     let mask = 1 << (src & 0x1f);
@@ -771,7 +771,7 @@ pub fn bchg_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
     Ok(8)
 }
 
-pub fn bchg_32_s_dn(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn bchg_32_s_dn<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = imm_8(core, bus)?;
     let mask = 1 << (src & 0x1f);
@@ -796,7 +796,7 @@ bchg_8!(bchg_8_s_ix, imm_8, ea_ay_ix_8, 12+10);
 bchg_8!(bchg_8_s_aw, imm_8, ea_aw_8,    12+8 );
 bchg_8!(bchg_8_s_al, imm_8, ea_al_8,    12+12);
 
-pub fn bclr_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn bclr_32_r_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = dx!(core);
     let mask = 1 << (src & 0x1f);
@@ -806,7 +806,7 @@ pub fn bclr_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
     Ok(10)
 }
 
-pub fn bclr_32_s_dn(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn bclr_32_s_dn<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = imm_8(core, bus)?;
     let mask = 1 << (src & 0x1f);
@@ -832,7 +832,7 @@ bclr_8!(bclr_8_s_aw, imm_8, ea_aw_8,    12+8 );
 bclr_8!(bclr_8_s_al, imm_8, ea_al_8,    12+12);
 
 
-pub fn bset_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn bset_32_r_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = dx!(core);
     let mask = 1 << (src & 0x1f);
@@ -842,7 +842,7 @@ pub fn bset_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
     Ok(8)
 }
 
-pub fn bset_32_s_dn(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn bset_32_s_dn<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = imm_8(core, bus)?;
     let mask = 1 << (src & 0x1f);
@@ -868,7 +868,7 @@ bset_8!(bset_8_s_aw, imm_8, ea_aw_8,    12+8 );
 bset_8!(bset_8_s_al, imm_8, ea_al_8,    12+12);
 
 
-pub fn btst_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn btst_32_r_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = dx!(core);
     let mask = 1 << (src & 0x1f);
@@ -877,7 +877,7 @@ pub fn btst_32_r_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
     Ok(6)
 }
 
-pub fn btst_32_s_dn(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn btst_32_s_dn<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let src = imm_8(core, bus)?;
     let mask = 1 << (src & 0x1f);
@@ -906,20 +906,20 @@ btst_8!(btst_8_s_al,   imm_8, al_8,    8+12);
 btst_8!(btst_8_s_pcdi, imm_8, pcdi_8,  8+8);
 btst_8!(btst_8_s_pcix, imm_8, pcix_8,  8+10);
 
-pub fn bra_8(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn bra_8<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let offset = mask_out_above_8!(core.ir) as i8;
     core.pc = core.pc.wrapping_add(offset as u32);
     Ok(10)
 }
 
-pub fn bra_16(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn bra_16<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let offset = core.read_imm_data_16(bus)? as i16;
     core.pc = core.pc.wrapping_sub(2);
     core.pc = core.pc.wrapping_add(offset as u32);
     Ok(10)
 }
 
-pub fn bsr_8(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn bsr_8<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let offset = mask_out_above_8!(core.ir) as i8;
     let pc = core.pc;
     core.push_32(bus, pc);
@@ -927,7 +927,7 @@ pub fn bsr_8(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
     Ok(18)
 }
 
-pub fn bsr_16(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn bsr_16<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let offset = core.read_imm_data_16(bus)? as i16;
     let pc = core.pc;
     core.push_32(bus, pc);
@@ -938,7 +938,7 @@ pub fn bsr_16(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
 
 macro_rules! chk_16 {
     ($name:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = dx!(core) as i16;
             let bound = $dst(core, bus)? as i16;
 
@@ -971,7 +971,7 @@ chk_16!(chk_16_pi,   ay_pi_16,  10 +  4);
 
 macro_rules! clr {
     ($name:ident, $dst:ident, $write_op:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // The MC68000PRM says: In the MC68000 and MC68008 a memory location is read before it is cleared.
             // We skip this as Musashi doesn't do that either.
             let ea = $dst(core, bus)?;
@@ -986,7 +986,7 @@ macro_rules! clr {
         });
 }
 
-pub fn clr_8_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn clr_8_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     dy!(core) &= 0xffffff00;
 
     core.n = 0;
@@ -1003,7 +1003,7 @@ clr!(clr_8_ix, index_ay,            write_data_8, 8+10);
 clr!(clr_8_aw, absolute_word,       write_data_8, 8+8);
 clr!(clr_8_al, absolute_long,       write_data_8, 8+12);
 
-pub fn clr_16_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn clr_16_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     dy!(core) &= 0xffff0000;
 
     core.n = 0;
@@ -1020,7 +1020,7 @@ clr!(clr_16_ix, index_ay,            write_data_16, 8+10);
 clr!(clr_16_aw, absolute_word,       write_data_16, 8+8);
 clr!(clr_16_al, absolute_long,       write_data_16, 8+12);
 
-pub fn clr_32_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn clr_32_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     dy!(core) = 0;
 
     core.n = 0;
@@ -1077,7 +1077,7 @@ impl_op!(-, cmp_32, cmp_32_imm,  imm_32,   dx, 6+8);
 
 macro_rules! cmpa_16 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)? as i16 as u32;
             let dst = ax(core, bus)?;
             let _ = cmp_32(core, dst, src);
@@ -1086,7 +1086,7 @@ macro_rules! cmpa_16 {
 }
 macro_rules! cmpa_32 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let dst = ax(core, bus)?;
             let _ = cmp_32(core, dst, src);
@@ -1172,8 +1172,8 @@ impl_op!(-, cmp_16, cmpm_16, ay_pi_16, ax_pi_16, 12);
 impl_op!(-, cmp_32, cmpm_32, ay_pi_32, ax_pi_32, 20);
 
 // Put implementation of DBcc ops here
-branch!(16, dbt_16,  T, dy);
-branch!(16, dbf_16,  F, dy);
+branch!(16, dbt_16,  True, dy);
+branch!(16, dbf_16,  False, dy);
 branch!(16, dbhi_16, HI, dy);
 branch!(16, dbls_16, LS, dy);
 branch!(16, dbcc_16, CC, dy);
@@ -1191,7 +1191,7 @@ branch!(16, dble_16, LE, dy);
 
 macro_rules! div_op {
     ($common:ident, $srctype:ty, $name:ident, $src:ident, $base_cycles:expr, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // as opposed to ADDA, we execute src op first
             // even though the PI/PD addressing modes will change AX (if AX=AY)
             let src = $src(core, bus)? as $srctype;
@@ -1338,13 +1338,13 @@ eori_32!(eori_32_al, ea_al_32,     20+16);
 // eori_32!(..., pcix) not present
 // eori_32!(..., imm) not present
 
-pub fn eori_16_toc(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn eori_16_toc<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = core.condition_code_register();
     let src = mask_out_above_8!(imm_16(core, bus)?) as u16;
     core.ccr_to_flags(dst ^ src);
     Ok(20)
 }
-pub fn eori_16_tos(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn eori_16_tos<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         let dst = core.status_register();
         let src = imm_16(core, bus)? as u16;
@@ -1356,21 +1356,21 @@ pub fn eori_16_tos(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
 }
 
 // Put implementation of EXG ops here
-pub fn exg_32_dd(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn exg_32_dd<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     core.dar.swap(ir_dx!(core), ir_dy!(core));
     Ok(6)
 }
-pub fn exg_32_aa(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn exg_32_aa<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     core.dar.swap(ir_ax!(core), ir_ay!(core));
     Ok(6)
 }
-pub fn exg_32_da(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn exg_32_da<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     core.dar.swap(ir_dx!(core), ir_ay!(core));
     Ok(6)
 }
 
 // Put implementation of EXT ops here
-pub fn ext_bw(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn ext_bw<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let res = mask_out_above_8!(dst) | if (dst & 0x80) > 0 {0xff00} else {0};
     dy!(core) = mask_out_below_16!(dy!(core)) | res;
@@ -1382,7 +1382,7 @@ pub fn ext_bw(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
 
     Ok(4)
 }
-pub fn ext_wl(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn ext_wl<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let dst = dy!(core);
     let res = mask_out_above_16!(dst) | if (dst & 0x8000) > 0 {0xffff0000} else {0};
     dy!(core) = res;
@@ -1400,14 +1400,14 @@ pub fn ext_wl(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
 // at least for now, as it is useful to be able to handle "unintended
 // use of possibly unimplemented instruction" differently from actually
 // wanting this to happen
-pub fn real_illegal(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn real_illegal<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     Err(IllegalInstruction(core.ir, core.pc.wrapping_sub(2)))
 }
 
 // Put implementation of JMP ops here
 macro_rules! jump {
     ($name:ident, $dst:ident, $push:expr, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let ea = $dst(core, bus)?;
             // using a constant expression will optimize this check away
             if $push {
@@ -1440,7 +1440,7 @@ jump!(jsr_32_pcix, index_pc, true, 22);
 // Put implementation of LEA ops here
 macro_rules! lea {
     ($name:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let ea = $dst(core, bus)?;
             ax!(core) = ea;
             Ok($cycles)
@@ -1455,7 +1455,7 @@ lea!(lea_32_pcdi, displacement_pc, 8);
 lea!(lea_32_pcix, index_pc, 12);
 
 // Put implementation of LINK ops here
-pub fn link_16(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn link_16<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let sp = if ir_ay!(core) == STACK_POINTER_REG {
         core.push_sp(bus)
     } else {
@@ -1523,14 +1523,14 @@ lsr_16!(lsr_16_al, ea_al_16,    20);
 // Put implementation of MOVE ops here
 macro_rules! impl_move {
     (8, $name:ident, dx, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = mask_out_above_8!($src(core, bus)?);
             dx!(core) = mask_out_below_8!(dx!(core)) | src;
             move_flags(core, src, 0);
             Ok($cycles)
         });
     (8, $name:ident, $dst:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = mask_out_above_8!($src(core, bus)?);
             let ea = $dst(core, bus)?;
             core.write_data_8(bus, ea, src as u8)?;
@@ -1538,14 +1538,14 @@ macro_rules! impl_move {
             Ok($cycles)
         });
     (16, $name:ident, dx, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = mask_out_above_16!($src(core, bus)?);
             dx!(core) = mask_out_below_16!(dx!(core)) | src;
             move_flags(core, src, 8);
             Ok($cycles)
         });
     (16, $name:ident, $dst:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = mask_out_above_16!($src(core, bus)?);
             let ea = $dst(core, bus)?;
             core.write_data_16(bus, ea, src as u16)?;
@@ -1553,14 +1553,14 @@ macro_rules! impl_move {
             Ok($cycles)
         });
     (32, $name:ident, dx, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             dx!(core) = src;
             move_flags(core, src, 24);
             Ok($cycles)
         });
     (32, $name:ident, $dst:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
             let ea = $dst(core, bus)?;
             core.write_data_32(bus, ea, src)?;
@@ -1887,7 +1887,7 @@ impl_move!(32, move_32_al_imm, absolute_long, imm_32, 20+8);
 // Put implementation of MOVEA ops here
 macro_rules! movea_16 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // we must evaluate AY (src) first
             // as the PI/PD addressing modes will change AX (if AX=AY)
             ax!(core) = $src(core, bus)? as i16 as u32;
@@ -1896,7 +1896,7 @@ macro_rules! movea_16 {
 }
 macro_rules! movea_32 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // we must evaluate AY (src) first
             // as the PI/PD addressing modes will change AX (if AX=AY)
             ax!(core) = $src(core, bus)?;
@@ -1932,7 +1932,7 @@ movea_32!(movea_32_imm, imm_32, 12);
 // Put implementation of MOVE to CCR ops here
 macro_rules! move_toc {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let ccr = $src(core, bus)? as u16;
             core.ccr_to_flags(ccr);
             Ok($cycles)
@@ -1953,12 +1953,12 @@ move_toc!(move_16_toc_imm, imm_16, 12+4);
 // Put implementation of MOVE from SR ops here
 macro_rules! move_frs {
     ($name:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             dy!(core) = mask_out_below_16!(dy!(core)) | core.status_register() as u32;
             Ok($cycles)
         });
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
   // unsigned int ea = ((m68ki_cpu.dar+8)[m68ki_cpu.ir & 7]);
   // m68ki_write_16_fc(ea, m68ki_cpu.s_flag | 1, ( m68ki_cpu.t1_flag | m68ki_cpu.t0_flag | (m68ki_cpu.s_flag << 11) | (m68ki_cpu.m_flag << 11) | m68ki_cpu.int_mask | (((m68ki_cpu.x_flag&0x100) >> 4) | ((m68ki_cpu.n_flag&0x80) >> 4) | ((!m68ki_cpu.not_z_flag) << 2) | ((m68ki_cpu.v_flag&0x80) >> 6) | ((m68ki_cpu.c_flag&0x100) >> 8))));
   // return;
@@ -1980,7 +1980,7 @@ move_frs!(move_16_frs_al, absolute_long,       8+12);
 // Put implementation of MOVE to SR ops here
 macro_rules! move_tos {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             if core.s != 0 {
                 let sr = $src(core, bus)? as u16;
                 core.sr_to_flags(sr);
@@ -2003,7 +2003,7 @@ move_tos!(move_16_tos_pcix, pcix_16, 12+10);
 move_tos!(move_16_tos_imm, imm_16, 12+4);
 
 // Put implementation of MOVE USP ops here
-pub fn move_32_tou(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn move_32_tou<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         core.inactive_usp = ay!(core);
         Ok(4)
@@ -2011,7 +2011,7 @@ pub fn move_32_tou(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
         Err(PrivilegeViolation(core.ir, core.pc.wrapping_sub(2)))
     }
 }
-pub fn move_32_fru(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn move_32_fru<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         ay!(core) = core.inactive_usp;
         Ok(4)
@@ -2022,7 +2022,7 @@ pub fn move_32_fru(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
 // Put implementation of MOVEM ops here
 macro_rules! movem_16_re {
     ($name:ident, predecrement_ay_16, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = ay!(core);
             let mut moves = 0;
@@ -2038,7 +2038,7 @@ macro_rules! movem_16_re {
             Ok($cycles + 4 * moves)
         });
     ($name:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = $dst(core, bus)?;
             let mut moves = 0;
@@ -2057,7 +2057,7 @@ macro_rules! movem_16_re {
 macro_rules! movem_16_er {
     ($name:ident, $src:ident, pc, $cycles:expr) => (movem_16_er!($name, $src, read_prog_16, $cycles););
     ($name:ident, postincrement_ay_16, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = ay!(core);
             let mut moves = 0;
@@ -2073,7 +2073,7 @@ macro_rules! movem_16_er {
         });
     ($name:ident, $src:ident, $cycles:expr) => (movem_16_er!($name, $src, read_data_16, $cycles););
     ($name:ident, $src:ident, $read_word:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = $src(core, bus)?;
             let mut moves = 0;
@@ -2089,7 +2089,7 @@ macro_rules! movem_16_er {
 }
 macro_rules! movem_32_re {
     ($name:ident, predecrement_ay_32, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = ay!(core);
             let mut moves = 0;
@@ -2105,7 +2105,7 @@ macro_rules! movem_32_re {
             Ok($cycles + 8 * moves)
         });
     ($name:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = $dst(core, bus)?;
             let mut moves = 0;
@@ -2123,7 +2123,7 @@ macro_rules! movem_32_re {
 macro_rules! movem_32_er {
     ($name:ident, $src:ident, pc, $cycles:expr) => (movem_32_er!($name, $src, read_prog_32, $cycles););
     ($name:ident, postincrement_ay_32, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = ay!(core);
             let mut moves = 0;
@@ -2139,7 +2139,7 @@ macro_rules! movem_32_er {
         });
     ($name:ident, $src:ident, $cycles:expr) => (movem_32_er!($name, $src, read_data_32, $cycles););
     ($name:ident, $src:ident, $read_long:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let registers = imm_16(core, bus)?;
             let mut ea = $src(core, bus)?;
             let mut moves = 0;
@@ -2184,21 +2184,21 @@ movem_32_er!(movem_32_er_pcdi, displacement_pc, pc, 16);
 movem_32_er!(movem_32_er_pcix, index_pc, pc, 18);
 
 // Put implementation of MOVEP ops here
-pub fn movep_16_er(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn movep_16_er<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let ea = displacement_ay(core, bus)?;
     dx!(core) = mask_out_below_16!(dx!(core))
     | (core.read_data_8(bus, ea)? as u32) << 8
     | core.read_data_8(bus, ea.wrapping_add(2))? as u32;
     Ok(16)
 }
-pub fn movep_16_re(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn movep_16_re<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let ea = displacement_ay(core, bus)?;
     let data = mask_out_above_16!(dx!(core));
     core.write_data_8(bus, ea, mask_out_above_8!(data >> 8) as u8)?;
     core.write_data_8(bus, ea.wrapping_add(2), mask_out_above_8!(data) as u8)?;
     Ok(16)
 }
-pub fn movep_32_er(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn movep_32_er<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let ea = displacement_ay(core, bus)?;
     dx!(core) = ((core.read_data_8(bus, ea))? as u32) << 24
               | ((core.read_data_8(bus, ea.wrapping_add(2)))? as u32) << 16
@@ -2206,7 +2206,7 @@ pub fn movep_32_er(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
               | ((core.read_data_8(bus, ea.wrapping_add(6)))? as u32);
     Ok(24)
 }
-pub fn movep_32_re(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn movep_32_re<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let ea = displacement_ay(core, bus)?;
     let data = dx!(core);
     core.write_data_8(bus, ea, mask_out_above_8!(data >> 24) as u8)?;
@@ -2217,7 +2217,7 @@ pub fn movep_32_re(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
 }
 
 // Put implementation of MOVEQ ops here
-pub fn moveq_32(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn moveq_32<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let res = mask_out_above_8!(core.ir) as i8 as u32;
     dx!(core) = res;
 
@@ -2232,7 +2232,7 @@ pub fn moveq_32(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
 // Put implementation of MULS ops here
 macro_rules! mul_op {
     ($common:ident, $srctype:ty, $name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)? as $srctype;
             let dst = dx!(core) as $srctype;
             dx!(core) = $common(core, dst, src);
@@ -2273,7 +2273,7 @@ mulu!(mulu_16_imm, imm_16, 54+4);
 // Put implementation of NBCD ops here
 macro_rules! nbcd {
     ($name:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             if let Some(res) = nbcd(core, dst) {
                 dy!(core) = mask_out_below_8!(dy!(core)) | res;
@@ -2281,7 +2281,7 @@ macro_rules! nbcd {
             Ok($cycles)
     });
     ($name:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             if let Some(res) = nbcd(core, dst) {
                 core.write_data_8(bus, ea, res as u8)?;
@@ -2301,14 +2301,14 @@ nbcd!(nbcd_8_al, ea_al_8, 8+12);
 // Put implementation of NEG ops here
 macro_rules! negop_8 {
     ($name:ident, $common:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             let res = $common(core, 0, dst);
             dy!(core) = mask_out_below_8!(dy!(core)) | res;
             Ok($cycles)
         });
     ($name:ident, $common:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, 0, dst);
             core.write_data_8(bus, ea, mask_out_above_8!(res) as u8)?;
@@ -2317,14 +2317,14 @@ macro_rules! negop_8 {
 }
 macro_rules! negop_16 {
     ($name:ident, $common:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             let res = $common(core, 0, dst);
             dy!(core) = mask_out_below_16!(dy!(core)) | res;
             Ok($cycles)
         });
     ($name:ident, $common:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, 0, dst);
             core.write_data_16(bus, ea, mask_out_above_16!(res) as u16)?;
@@ -2333,14 +2333,14 @@ macro_rules! negop_16 {
 }
 macro_rules! negop_32 {
     ($name:ident, $common:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             let res = $common(core, 0, dst);
             dy!(core) = res;
             Ok($cycles)
         });
     ($name:ident, $common:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, 0, dst);
             core.write_data_32(bus, ea, res)?;
@@ -2421,21 +2421,21 @@ negx_32!(negx_32_aw, ea_aw_32, 12+12);
 negx_32!(negx_32_al, ea_al_32, 12+16);
 
 // Put implementation of NOP ops here
-pub fn nop(_core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn nop<T: Bus + ?Sized>(_core: &mut M68k, _bus: &mut T) -> Result<u32> {
     Ok(4)
 }
 
 // Put implementation of NOT ops here
 macro_rules! notop_8 {
     ($name:ident, $common:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             let res = $common(core, dst);
             dy!(core) = mask_out_below_8!(dy!(core)) | res;
             Ok($cycles)
         });
     ($name:ident, $common:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst);
             core.write_data_8(bus, ea, mask_out_above_8!(res) as u8)?;
@@ -2444,14 +2444,14 @@ macro_rules! notop_8 {
 }
 macro_rules! notop_16 {
     ($name:ident, $common:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             let res = $common(core, dst);
             dy!(core) = mask_out_below_16!(dy!(core)) | res;
             Ok($cycles)
         });
     ($name:ident, $common:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst);
             core.write_data_16(bus, ea, mask_out_above_16!(res) as u16)?;
@@ -2460,14 +2460,14 @@ macro_rules! notop_16 {
 }
 macro_rules! notop_32 {
     ($name:ident, $common:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
             let res = $common(core, dst);
             dy!(core) = res;
             Ok($cycles)
         });
     ($name:ident, $common:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
             let res = $common(core, dst);
             core.write_data_32(bus, ea, res)?;
@@ -2659,14 +2659,14 @@ ori_32!(ori_32_al, ea_al_32,     20+16);
 // ori_32!(..., imm) not present
 
 // Put implementation of ORI to CCR ops here
-pub fn ori_16_toc(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn ori_16_toc<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let dst = core.condition_code_register();
     let src = mask_out_above_8!(imm_16(core, bus)?) as u16;
     core.ccr_to_flags(dst | src);
     Ok(20)
 }
 // Put implementation of ORI to SR ops here
-pub fn ori_16_tos(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn ori_16_tos<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         let dst = core.status_register();
         let src = imm_16(core, bus)? as u16;
@@ -2680,7 +2680,7 @@ pub fn ori_16_tos(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
 // Put implementation of PEA ops here
 macro_rules! pea {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let ea = $src(core, bus)?;
             core.push_32(bus, ea);
             Ok($cycles)
@@ -2695,7 +2695,7 @@ pea!(pea_32_pcdi, displacement_pc, 16);
 pea!(pea_32_pcix, index_pc, 20);
 
 // Put implementation of RESET ops here
-pub fn reset(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn reset<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         //core.int_ctrl.reset_external_devices();   TODO - setup
         Ok(132)
@@ -2811,7 +2811,7 @@ roxr_16!(roxr_16_aw, ea_aw_16,    16);
 roxr_16!(roxr_16_al, ea_al_16,    20);
 
 // Put implementation of RTE ops here
-pub fn rte_32(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn rte_32<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         let new_sr = core.pop_16(bus);
         let new_pc = core.pop_32(bus);
@@ -2827,7 +2827,7 @@ pub fn rte_32(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
 }
 
 // Put implementation of RTR ops here
-pub fn rtr_32(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn rtr_32<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let new_ccr = core.pop_16(bus);
     let new_pc = core.pop_32(bus);
     core.pc = new_pc;
@@ -2836,7 +2836,7 @@ pub fn rtr_32(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
 }
 
 // Put implementation of RTS ops here
-pub fn rts_32(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn rts_32<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let new_pc = core.pop_32(bus);
     core.pc = new_pc;
     Ok(16)
@@ -2847,7 +2847,7 @@ impl_op!(8, sbcd_8, sbcd_8_mm, ay_pd_8, ea_ax_pd_8, 18);
 
 macro_rules! sxx_8_dn {
     ($name:ident, $cond:ident) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let cycles = match core.condition($cond) {
                 false => {
                     dy!(core) &= 0xffffff00;
@@ -2865,7 +2865,7 @@ macro_rules! sxx_8_dn {
 
 macro_rules! sxx_8 {
     ($name:ident, $cond:tt, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let t = match core.condition($cond) { false => 0u8, true => 0xffu8 };
             let ea = $dst(core, bus)?;
             core.write_data_8(bus, ea, t)?;
@@ -2901,14 +2901,14 @@ sxx_8!(seq_8_ix, EQ, index_ay,            18);
 sxx_8!(seq_8_pd, EQ, predecrement_ay_8,   14);
 sxx_8!(seq_8_pi, EQ, postincrement_ay_8,  12);
 
-sxx_8_dn!(sf_8_dn, F);
-sxx_8!(sf_8_ai, F, address_indirect_ay, 12);
-sxx_8!(sf_8_al, F, absolute_long,       20);
-sxx_8!(sf_8_aw, F, absolute_word,       16);
-sxx_8!(sf_8_di, F, displacement_ay,     16);
-sxx_8!(sf_8_ix, F, index_ay,            18);
-sxx_8!(sf_8_pd, F, predecrement_ay_8,   14);
-sxx_8!(sf_8_pi, F, postincrement_ay_8,  12);
+sxx_8_dn!(sf_8_dn, False);
+sxx_8!(sf_8_ai, False, address_indirect_ay, 12);
+sxx_8!(sf_8_al, False, absolute_long,       20);
+sxx_8!(sf_8_aw, False, absolute_word,       16);
+sxx_8!(sf_8_di, False, displacement_ay,     16);
+sxx_8!(sf_8_ix, False, index_ay,            18);
+sxx_8!(sf_8_pd, False, predecrement_ay_8,   14);
+sxx_8!(sf_8_pi, False, postincrement_ay_8,  12);
 
 sxx_8_dn!(sge_8_dn, GE);
 sxx_8!(sge_8_ai, GE, address_indirect_ay, 12);
@@ -2991,14 +2991,14 @@ sxx_8!(spl_8_ix, PL, index_ay,            18);
 sxx_8!(spl_8_pd, PL, predecrement_ay_8,   14);
 sxx_8!(spl_8_pi, PL, postincrement_ay_8,  12);
 
-sxx_8_dn!(st_8_dn, T);
-sxx_8!(st_8_ai, T, address_indirect_ay, 12);
-sxx_8!(st_8_al, T, absolute_long,       20);
-sxx_8!(st_8_aw, T, absolute_word,       16);
-sxx_8!(st_8_di, T, displacement_ay,     16);
-sxx_8!(st_8_ix, T, index_ay,            18);
-sxx_8!(st_8_pd, T, predecrement_ay_8,   14);
-sxx_8!(st_8_pi, T, postincrement_ay_8,  12);
+sxx_8_dn!(st_8_dn, True);
+sxx_8!(st_8_ai, True, address_indirect_ay, 12);
+sxx_8!(st_8_al, True, absolute_long,       20);
+sxx_8!(st_8_aw, True, absolute_word,       16);
+sxx_8!(st_8_di, True, displacement_ay,     16);
+sxx_8!(st_8_ix, True, index_ay,            18);
+sxx_8!(st_8_pd, True, predecrement_ay_8,   14);
+sxx_8!(st_8_pi, True, postincrement_ay_8,  12);
 
 sxx_8_dn!(svc_8_dn, VC);
 sxx_8!(svc_8_ai, VC, address_indirect_ay, 12);
@@ -3019,7 +3019,7 @@ sxx_8!(svs_8_pd, VS, predecrement_ay_8,   14);
 sxx_8!(svs_8_pi, VS, postincrement_ay_8,  12);
 
 // Put implementation of STOP ops here
-pub fn stop(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn stop<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     if core.s != 0 {
         // Stops the fetching and executing of instructions. A trace,
         // interrupt, or reset exception causes the processor to resume
@@ -3142,7 +3142,7 @@ sub_32_re!(sub_32_re_al, ea_al_32,     20+8);
 
 macro_rules! suba_16 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // we must evaluate AY (src) first
             // as the PI/PD addressing modes will change AX (if AX=AY)
             let src = $src(core, bus)?;
@@ -3153,7 +3153,7 @@ macro_rules! suba_16 {
 }
 macro_rules! suba_32 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             // we must evaluate AY (src) first
             // as the PI/PD addressing modes will change AX (if AX=AY)
             let src = $src(core, bus)?;
@@ -3260,7 +3260,7 @@ subq_8!(subq_8_al, ea_al_8,     8+12);
 // subq_8!(..., imm) not present
 
 subq_16!(subq_16_dn, dy,  4);
-pub fn subq_16_an(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn subq_16_an<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let src = quick(core, bus)?;
     let dst = ay!(core);
     // When adding to address registers, the condition codes are not
@@ -3281,7 +3281,7 @@ subq_16!(subq_16_al, ea_al_16,     8+12);
 // subq_16!(..., imm) not present
 
 subq_32!(subq_32_dn, dy,  8);
-pub fn subq_32_an(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn subq_32_an<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let src = quick(core, bus)?;
     let dst = ay!(core);
     // When adding to address registers, the condition codes are not
@@ -3308,7 +3308,7 @@ impl_op!(16, subx_16, subx_16_mm, ay_pd_16, ea_ax_pd_16, 18);
 impl_op!(32, subx_32, subx_32_rr, dy, dx, 8);
 impl_op!(32, subx_32, subx_32_mm, ay_pd_32, ea_ax_pd_32, 30);
 
-pub fn swap_32_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn swap_32_dn<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     let v = dy!(core);
     let res = ((v & 0x0000ffff) << 16) | (v >> 16);
 
@@ -3325,7 +3325,7 @@ pub fn swap_32_dn(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
 // Put implementation of TAS ops here
 macro_rules! tas_8 {
     ($name:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let dst = dy!(core);
 
             core.not_z = mask_out_above_8!(dst);
@@ -3337,7 +3337,7 @@ macro_rules! tas_8 {
             Ok($cycles)
         });
     ($name:ident, $dst:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let (dst, ea) = $dst(core, bus)?;
 
             core.not_z = dst;
@@ -3359,12 +3359,12 @@ tas_8!(tas_8_aw, ea_aw_8, 14+8);
 tas_8!(tas_8_al, ea_al_8, 14+12);
 
 // Put implementation of TRAP ops here
-pub fn trap(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn trap<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     Err(Trap(EXCEPTION_TRAP_BASE + low_nibble!(core.ir) as u8, 34))
 }
 
 // Put implementation of TRAPV ops here
-pub fn trapv(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+pub fn trapv<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
     if core.v != 0 {
         Err(Trap(EXCEPTION_TRAPV, 34))
     } else {
@@ -3375,7 +3375,7 @@ pub fn trapv(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
 // Put implementation of TST ops here
 macro_rules! tst_8 {
     ($name:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let src = mask_out_above_8!(dy!(core));
 
             core.not_z = src;
@@ -3386,7 +3386,7 @@ macro_rules! tst_8 {
             Ok($cycles)
         });
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
 
             core.not_z = src;
@@ -3399,7 +3399,7 @@ macro_rules! tst_8 {
 }
 macro_rules! tst_16 {
     ($name:ident, dy, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, _bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, _bus: &mut T) -> Result<u32> {
             let src = mask_out_above_16!(dy!(core));
 
             core.not_z = src;
@@ -3410,7 +3410,7 @@ macro_rules! tst_16 {
             Ok($cycles)
         });
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
 
             core.not_z = src;
@@ -3423,7 +3423,7 @@ macro_rules! tst_16 {
 }
 macro_rules! tst_32 {
     ($name:ident, $src:ident, $cycles:expr) => (
-        pub fn $name(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+        pub fn $name<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
             let src = $src(core, bus)?;
 
             core.not_z = src;
@@ -3473,7 +3473,7 @@ tst_32!(tst_32_al,   al_32,     4+16);
 // tst_32!(tst_32_imm,  imm_32,    4+8);
 
 // Put implementation of UNLK ops here
-pub fn unlk_32(core: &mut M68k, bus: &mut impl Bus) -> Result<u32> {
+pub fn unlk_32<T: Bus + ?Sized>(core: &mut M68k, bus: &mut T) -> Result<u32> {
     let ay = ay!(core);
     sp!(core) = ay;
     ay!(core) = core.pop_32(bus);

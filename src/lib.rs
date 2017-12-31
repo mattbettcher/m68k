@@ -34,8 +34,8 @@ impl fmt::Display for Exception {
 }
 
 pub enum Condition {
-    T,   // True            1
-    F,   // False           0
+    True,   // True            1
+    False,   // False           0
     HI,  // High            !C & !Z
     LS,  // LowOrSame       C | Z
     CC,  // CarryClearHI    !C
@@ -89,8 +89,8 @@ pub const USER_PROGRAM: AddressSpace = AddressSpace(Mode::User, Segment::Program
 pub const USER_DATA: AddressSpace = AddressSpace(Mode::User, Segment::Data);
 
 pub type Result<T> = result::Result<T, Exception>;
-pub type Handler = fn(&mut M68k, &mut Bus) -> Result<u32>;
-pub type InstructionSet = Vec<Handler>;
+pub type Handler<'a> = fn(&mut M68k, &mut (Bus + 'a)) -> Result<u32>;
+pub type InstructionSet<'a> = Vec<Handler<'a>>;
 
 pub trait Bus {
     fn read_8(&self, space: AddressSpace, addr: u32) -> u8;
@@ -117,7 +117,7 @@ pub struct CacheLine020 {
     pub word: [u16; 2],
 }
 
-pub struct M68k {
+pub struct M68k<'a> {
     pub version: Version,
     pub pc: u32,
     pub inactive_ssp: u32, // when in user mode
@@ -144,10 +144,10 @@ pub struct M68k {
     pub cache_enabled: bool,    // this represents the external pin???
     pub cache: [CacheLine020; 64], // '020 only! other caches are different
 
-    pub ops: InstructionSet,
+    pub ops: InstructionSet<'a>,
 }
 
-impl M68k {
+impl<'a> M68k<'a> {
     pub fn new(version: Version) -> Self {
         M68k {
             version: version,
@@ -166,7 +166,7 @@ impl M68k {
         }
     }
 
-    pub fn step(&mut self, bus: &mut impl Bus) {
+    pub fn step<T: Bus + ?Sized>(&mut self, bus: &mut T) {
         if let Ok(x) = self.read_imm_prog_16(bus) {
             self.ir = x;
         }
@@ -216,8 +216,8 @@ impl M68k {
 
     fn condition(&self, c: Condition) -> bool {
         match c {
-            Condition::T  => true,
-            Condition::F  => false,
+            Condition::True  => true,
+            Condition::False  => false,
             Condition::HI => (self.c & CFLAG_SET==0) && (self.not_z != ZFLAG_SET),
             Condition::LS => (self.c & CFLAG_SET!=0) || (self.not_z == ZFLAG_SET),
             Condition::CC => self.c & CFLAG_SET==0,
@@ -234,93 +234,93 @@ impl M68k {
             Condition::LE => (self.not_z == ZFLAG_SET) || (self.n & NFLAG_SET!=0) && (self.v & VFLAG_SET==0) || (self.n & NFLAG_SET==0) && (self.v & VFLAG_SET!=0),
         }
     }
-    fn push_sp(&mut self, bus: &mut impl Bus) -> u32 {
+    fn push_sp<T: Bus + ?Sized>(&mut self, bus: &mut T) -> u32 {
          let new_sp = (Wrapping(sp!(self)) - Wrapping(4)).0;
          sp!(self) = new_sp;
          self.write_data_32(bus, new_sp, new_sp).unwrap();
          new_sp
     }
-    fn push_32(&mut self, bus: &mut impl Bus, value: u32) -> u32 {
+    fn push_32<T: Bus + ?Sized>(&mut self, bus: &mut T, value: u32) -> u32 {
          let new_sp = (Wrapping(sp!(self)) - Wrapping(4)).0;
          sp!(self) = new_sp;
          self.write_data_32(bus, new_sp, value).unwrap();
          new_sp
     }
-    fn pop_32(&mut self, bus: &mut impl Bus) -> u32 {
+    fn pop_32<T: Bus + ?Sized>(&mut self, bus: &mut T) -> u32 {
         let sp = sp!(self);
         let data = self.read_data_32(bus, sp).unwrap();
         sp!(self) = sp.wrapping_add(4);
         data
     }
-    fn push_16(&mut self, bus: &mut impl Bus, value: u16) -> u32 {
+    fn push_16<T: Bus + ?Sized>(&mut self, bus: &mut T, value: u16) -> u32 {
          let new_sp = (Wrapping(sp!(self)) - Wrapping(2)).0;
          sp!(self) = new_sp;
          self.write_data_16(bus, new_sp, value).unwrap();
          new_sp
     }
-    fn pop_16(&mut self, bus: &mut impl Bus) -> u16 {
+    fn pop_16<T: Bus + ?Sized>(&mut self, bus: &mut T) -> u16 {
         let sp = sp!(self);
         let data = self.read_data_32(bus, sp).unwrap() as u16;
         sp!(self) = sp.wrapping_add(2);
         data
     }
 
-    fn write_data_8(&mut self, bus: &mut impl Bus, addr: u32, value: u8) -> Result<()> {
+    fn write_data_8<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32, value: u8) -> Result<()> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.write_8(address_space, addr, value))
     }
 
-    fn write_data_16(&mut self, bus: &mut impl Bus, addr: u32, value: u16) -> Result<()> {
+    fn write_data_16<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32, value: u16) -> Result<()> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.write_16(address_space, addr, value))
     }
 
-    fn write_data_32(&mut self, bus: &mut impl Bus, addr: u32, value: u32) -> Result<()> {
+    fn write_data_32<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32, value: u32) -> Result<()> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.write_32(address_space, addr, value))
     }
 
-    fn read_data_8(&mut self, bus: &mut impl Bus, addr: u32) -> Result<u8> {
+    fn read_data_8<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32) -> Result<u8> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.read_8(address_space, addr))
     }
 
-    fn read_data_16(&mut self, bus: &mut impl Bus, addr: u32) -> Result<u16> {
+    fn read_data_16<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32) -> Result<u16> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.read_16(address_space, addr))
     }
 
-    fn read_data_32(&mut self, bus: &mut impl Bus, addr: u32) -> Result<u32> {
+    fn read_data_32<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32) -> Result<u32> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.read_32(address_space, addr))
     }
 
-    fn read_prog_8(&mut self, bus: &mut impl Bus, addr: u32) -> Result<u8> {
+    fn read_prog_8<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32) -> Result<u8> {
         let address_space = if self.s != 0 {SUPERVISOR_PROGRAM} else {USER_PROGRAM};
         Ok(bus.read_8(address_space, addr))
     }
 
-    fn read_prog_16(&mut self, bus: &mut impl Bus, addr: u32) -> Result<u16> {
+    fn read_prog_16<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32) -> Result<u16> {
         let address_space = if self.s != 0 {SUPERVISOR_PROGRAM} else {USER_PROGRAM};
         Ok(bus.read_16(address_space, addr))
     }
 
-    fn read_prog_32(&mut self, bus: &mut impl Bus, addr: u32) -> Result<u32> {
+    fn read_prog_32<T: Bus + ?Sized>(&mut self, bus: &mut T, addr: u32) -> Result<u32> {
         let address_space = if self.s != 0 {SUPERVISOR_PROGRAM} else {USER_PROGRAM};
         Ok(bus.read_32(address_space, addr))
     }
 
-    fn read_imm_data_16(&mut self, bus: &mut impl Bus) -> Result<u16> {
+    fn read_imm_data_16<T: Bus + ?Sized>(&mut self, bus: &mut T) -> Result<u16> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.read_16(address_space, self.pc))
     }
 
-    fn read_imm_data_32(&mut self, bus: &mut impl Bus) -> Result<u32> {
+    fn read_imm_data_32<T: Bus + ?Sized>(&mut self, bus: &mut T) -> Result<u32> {
         let address_space = if self.s != 0 {SUPERVISOR_DATA} else {USER_DATA};
         Ok(bus.read_32(address_space, self.pc))
     }
 
-    fn read_imm_prog_16(&mut self, bus: &mut impl Bus) -> Result<u16> {
+    fn read_imm_prog_16<T: Bus + ?Sized>(&mut self, bus: &mut T) -> Result<u16> {
         let address_space = if self.s != 0 {SUPERVISOR_PROGRAM} else {USER_PROGRAM};
         match self.version {
             Version::MC68000 => {

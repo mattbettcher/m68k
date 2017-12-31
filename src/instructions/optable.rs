@@ -132,11 +132,11 @@ pub const OP_UNIMPLEMENTED_1010 : u32 = 0b1010_0000_0000_0000;
 pub const OP_UNIMPLEMENTED_1111 : u32 = 0b1111_0000_0000_0000;
 
 #[allow(dead_code)]
-struct OpcodeHandler {
+struct OpcodeHandler<'a> {
     mask: u32,
     matching: u32,
     //name: &'static str,
-    handler: Handler,
+    handler: Handler<'a>,
 }
 
 macro_rules! op_entry {
@@ -1998,7 +1998,7 @@ pub const OP_TST_32_IMM  : u32 = OP_TST | LONG_SIZED | OPER_IMM;
 // Put constants for UNLK here
 pub const OP_UNLK_32     : u32 = 0b0100_1110_0101_1000;
 
-fn generate_optable() -> Vec<OpcodeHandler> {
+fn generate_optable<'a>() -> Vec<OpcodeHandler<'a>> {
     // the optable contains opcode mask, matching mask and the corresponding handler + name
     let optable = vec![
         op_entry!(MASK_LO3NIB, OP_UNIMPLEMENTED_1010, unimplemented_1010),
@@ -3795,7 +3795,7 @@ fn generate_optable() -> Vec<OpcodeHandler> {
     optable
 }
 
-pub fn generate() -> InstructionSet {
+pub fn generate<'a>() -> InstructionSet<'a> {
     // Covers all possible IR values (64k entries)
     let mut handler: InstructionSet = Vec::with_capacity(0x10000);
     for _ in 0..0x10000 { handler.push(illegal); }
