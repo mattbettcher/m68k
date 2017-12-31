@@ -5,4 +5,4 @@ pub mod constants;
 mod op_functions;
 mod operator;
 mod effective_address;
-mod optable;
+pub mod optable;

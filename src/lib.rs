@@ -8,6 +8,7 @@ mod instructions;
 
 use std::num::Wrapping;
 use instructions::constants::*;
+use instructions::optable::generate;
 use std::result;
 
 #[derive(Debug)]
@@ -165,7 +166,7 @@ impl<'a> M68k<'a> {
             cache_enabled: true,
             cache: [CacheLine020::default(); 64],
 
-            ops: Vec::new()
+            ops: generate(),
         }
     }
 
@@ -177,11 +178,20 @@ impl<'a> M68k<'a> {
         self.pc = self.read_imm_prog_32(bus).unwrap();
     }
 
-    pub fn step<T: Bus + ?Sized>(&mut self, bus: &mut T) {
-        if let Ok(x) = self.read_imm_prog_16(bus) {
-            self.ir = x;
+    // returns # of cycles used
+    pub fn step<T: Bus + 'a>(&mut self, bus: &mut T) -> u32 {
+        // handle interrupts here
+        
+        // this isn't correct for any model currently
+        self.ir = self.read_imm_prog_16(bus).unwrap();
+        let op = self.ops[self.ir as usize];
+        let cycles_used = (op)(self, bus);
+
+        match cycles_used {
+            Ok(cycles) => cycles,
+            Err(e) => unimplemented!(),
         }
-        self.pc = self.pc.wrapping_add(2);
+        //self.pc = self.pc.wrapping_add(2);
     }
 
     pub fn status_register(&self) -> u16 {
