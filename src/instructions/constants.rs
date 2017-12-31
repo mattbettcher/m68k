@@ -20,6 +20,8 @@ pub const CPU_SR_MASK: u16 = 0xf71f;        /* T1 T2 S  M  -- I2 I1 I0 -- -- -- 
 pub const CPU_SR_INT_MASK: u32 = 0x0700;    /* -- -- -- -- -- I2 I1 I0 -- -- -- -- -- -- -- -- */
 pub const CPU_CACR_MASK: u32 = 0x000f;      /* -- -- -- -- -- -- -- -- -- -- -- -- C  CE F  E  */
 pub const CPU_CAAR_MASK: u32 = 0x00ff;      /* -- -- -- -- -- -- -- -- I5 I4 I3 I2 I1 I0 -- -- */
+pub const CPU_SFC_MASK: u32 = 0x0007;       /* -- -- -- -- -- -- -- -- -- -- -- -- -- FC2 FC1 FC0 */
+pub const CPU_DFC_MASK: u32 = 0x0007;       /* -- -- -- -- -- -- -- -- -- -- -- -- -- FC2 FC1 FC0 */
 
 pub const SFLAG_BIT: u16 = 13;
 pub const MFLAG_BIT: u16 = 12;
